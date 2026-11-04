@@ -1,0 +1,3 @@
+ifneq ($(CONFIG_OCRE),)
+CONFIGURED_APPS += $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+endif

@@ -1,0 +1,133 @@
+menuconfig OCRE
+	tristate "Ocre Runtime"
+	default n
+	depends on !DISABLE_MQUEUE
+	select PSEUDOFS_SOFTLINKS
+	---help---
+		Enable the Ocre container runtime. Containers are WebAssembly
+		modules executed by WAMR (WebAssembly Micro Runtime).
+
+if OCRE
+
+config OCRE_DEFAULT_WORKING_DIRECTORY
+	string "Default working directory"
+	default "/mnt/sd0/ocre"
+	---help---
+		Directory holding the 'images' and 'containers' directories.
+
+config OCRE_CONTAINER_STACK_SIZE
+	int "Container thread stack size"
+	default 16384
+	---help---
+		Stack size of the thread executing each container.
+
+config OCRE_LOG_LEVEL
+	int "Maximum compiled log level"
+	default 3
+	range 0 4
+	---help---
+		0: off, 1: error, 2: warning, 3: info, 4: debug
+
+config OCRE_LOG_LEVEL_DEFAULT
+	int "Default runtime log level"
+	default 2
+	range 0 4
+
+config OCRE_WAMR_LOG_LEVEL
+	int "WAMR log level"
+	default 2
+	range 0 5
+
+config OCRE_WAMR_INTERPRETER
+	bool "WAMR fast interpreter"
+	default y
+
+config OCRE_WAMR_AOT
+	bool "WAMR AOT support"
+	default n
+	select ARCH_USE_TEXT_HEAP if ARCH_HAVE_TEXT_HEAP
+
+config OCRE_TIMER
+	bool "Ocre timer API"
+	default y
+	select SIG_EVTHREAD
+
+config OCRE_MAX_TIMERS
+	int "Maximum number of timers"
+	default 5
+	depends on OCRE_TIMER
+
+config OCRE_CONTAINER_MESSAGING
+	bool "Container messaging"
+	default y
+
+config OCRE_MESSAGING_MAX_SUBSCRIPTIONS
+	int "Maximum number of messaging subscriptions"
+	default 8
+	depends on OCRE_CONTAINER_MESSAGING
+
+config OCRE_FILESYSTEM
+	bool "Filesystem access for containers"
+	default y
+
+config OCRE_NETWORKING
+	bool "Networking access for containers"
+	default n
+	depends on NET
+
+config OCRE_SHARED_HEAP
+	bool "WAMR shared heap"
+	default n
+
+if OCRE_SHARED_HEAP
+
+config OCRE_SHARED_HEAP_BUF_VIRTUAL
+	bool
+	default y
+
+config OCRE_SHARED_HEAP_BUF_SIZE
+	int "Shared heap size"
+	default 32768
+
+endif # OCRE_SHARED_HEAP
+
+config OCRE_MINI
+	bool "ocre_mini sample command"
+	default y
+	---help---
+		Runs the embedded hello-world container once.
+
+config OCRE_MINI_STACKSIZE
+	int "ocre_mini stack size"
+	default 8192
+	depends on OCRE_MINI
+
+config OCRE_SHELL
+	bool "ocre / ocred commands"
+	default y
+	---help---
+		'ocred' is the daemon that owns the Ocre context and the container
+		threads. 'ocre' forwards its command line to the daemon.
+
+if OCRE_SHELL
+
+config OCRE_DAEMON_PRIORITY
+	int "ocred priority"
+	default 100
+
+config OCRE_DAEMON_STACKSIZE
+	int "ocred stack size"
+	default 8192
+
+config OCRE_CLIENT_STACKSIZE
+	int "ocre stack size"
+	default 2048
+
+config OCRE_IMAGE_PULL
+	bool "Image pull over HTTP"
+	default y
+	depends on NETUTILS_WEBCLIENT
+
+endif # OCRE_SHELL
+
+endif # OCRE

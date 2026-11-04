@@ -81,5 +81,6 @@ Ocre Runtime currently supports the following platforms:
 
 - [POSIX](PlatformPosix.md)
 - [Zephyr](PlatformZephyr.md)
+- [NuttX](PlatformNuttX.md)
 
 Please refer to the platform-specific documentation for more information about their implementation.
