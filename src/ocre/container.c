@@ -392,6 +392,16 @@ int ocre_container_start(struct ocre_container *container)
 		goto error_mutex;
 	}
 
+#ifdef CONFIG_OCRE_CONTAINER_STACK_SIZE
+	/* Some platforms (i.e. NuttX) have a default pthread stack that is too small for the runtime */
+
+	rc = pthread_attr_setstacksize(&container->attr, CONFIG_OCRE_CONTAINER_STACK_SIZE);
+	if (rc) {
+		LOG_ERR("Failed to set container stack size: rc=%d", rc);
+		goto error_attr;
+	}
+#endif
+
 	struct container_thread_params *params;
 	params = malloc(sizeof(struct container_thread_params));
 	if (!params) {
