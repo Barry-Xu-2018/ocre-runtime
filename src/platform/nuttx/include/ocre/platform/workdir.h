@@ -1,3 +1,9 @@
+/**
+ * Copyright 2026 Sony Group Corporation.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef OCRE_PLATFORM_NUTTX_WORKDIR_H
 #define OCRE_PLATFORM_NUTTX_WORKDIR_H
 

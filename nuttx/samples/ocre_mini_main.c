@@ -1,3 +1,9 @@
+/**
+ * Copyright 2026 Sony Group Corporation.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <ocre/platform/config.h>
 #include <ocre/platform/workdir.h>
 
