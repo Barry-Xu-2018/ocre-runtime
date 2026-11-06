@@ -72,7 +72,7 @@ config OCRE_FILESYSTEM
 
 config OCRE_NETWORKING
 	bool "Networking access for containers"
-	default n
+	default y
 	depends on NET
 
 config OCRE_SHARED_HEAP
