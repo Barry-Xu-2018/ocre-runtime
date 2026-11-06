@@ -1,6 +1,12 @@
 include $(APPDIR)/Make.defs
 
-OCRE_SRC = ../src
+# OCRE_NUTTX is this directory. It is set by a build directory that includes
+# this Makefile (see spresense/setup.sh), so that objects and generated files
+# are created there instead of in the source tree. The build directory needs
+# a 'wamr' link to the WAMR sources, like this directory.
+
+OCRE_NUTTX ?= $(CURDIR)
+OCRE_SRC = $(OCRE_NUTTX)/../src
 
 # WAMR, built with its NuttX makefile. wamr.mk expects the sources at ./wamr
 # and is configured with CONFIG_INTERPRETERS_WAMR_* variables, which are set
@@ -40,7 +46,7 @@ CFLAGS += ${INCDIR_PREFIX}$(OCRE_SRC)/runtime/wamr-wasip1/include
 CFLAGS += ${INCDIR_PREFIX}$(OCRE_SRC)/uthash/include
 CFLAGS += ${INCDIR_PREFIX}$(OCRE_SRC)/shell/include
 
-# Sources are found through VPATH, so objects are created in this directory.
+# Sources are found through VPATH, so objects are created in the build directory.
 # Sources sharing a basename are compiled through the wrappers in shell/.
 # The mini sample is compiled through samples/ocre_mini_main.c.
 
@@ -72,7 +78,7 @@ CSRCS += memory.c log.c file_alloc_read.c lstat.c workdir.c
 # shell, daemon and client
 
 ifeq ($(CONFIG_OCRE_SHELL),y)
-VPATH += shell
+VPATH += $(OCRE_NUTTX)/shell
 VPATH += $(OCRE_SRC)/shell
 VPATH += $(OCRE_SRC)/shell/image
 VPATH += $(OCRE_SRC)/shell/container
@@ -94,7 +100,7 @@ endif
 # mini sample
 
 ifeq ($(CONFIG_OCRE_MINI),y)
-VPATH += samples
+VPATH += $(OCRE_NUTTX)/samples
 
 OCRE_INPUT_FILE ?= $(OCRE_SRC)/samples/mini/hello-world.wasm
 
@@ -105,8 +111,8 @@ PRIORITY  += SCHED_PRIORITY_DEFAULT
 STACKSIZE += $(CONFIG_OCRE_MINI_STACKSIZE)
 MAINSRC   += ocre_mini_main.c
 
-input_file.c: $(OCRE_INPUT_FILE) ../scripts/c_array.awk
-	$(Q) od -v -An -tx1 $< | awk -f ../scripts/c_array.awk > $@
+input_file.c: $(OCRE_INPUT_FILE) $(OCRE_NUTTX)/../scripts/c_array.awk
+	$(Q) od -v -An -tx1 $< | awk -f $(OCRE_NUTTX)/../scripts/c_array.awk > $@
 endif
 
 MODULE = $(CONFIG_OCRE)
@@ -121,12 +127,16 @@ generated/build_info.h:
 generated/commit_id.h:
 	$(Q) mkdir -p generated
 	$(Q) echo "/* Auto-generated file. DO NOT EDIT */" > $@
-	$(Q) echo "#define GIT_COMMIT_ID \"$$(git -C .. describe --always --abbrev=0 --dirty 2>/dev/null || echo unknown)\"" >> $@
+	$(Q) echo "#define GIT_COMMIT_ID \"$$(git -C $(OCRE_NUTTX)/.. describe --always --abbrev=0 --dirty 2>/dev/null || echo unknown)\"" >> $@
 
 context:: generated/build_info.h generated/commit_id.h $(filter input_file.c,$(CSRCS))
 
-distclean::
+# Removed on clean, so that a full rebuild updates the build date and commit
+
+clean::
 	$(call DELDIR, generated)
+
+distclean::
 	$(call DELFILE, input_file.c)
 
 include $(APPDIR)/Application.mk

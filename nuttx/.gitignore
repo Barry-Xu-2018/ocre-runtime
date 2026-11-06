@@ -2,3 +2,5 @@
 Make.dep
 generated/
 input_file.c
+.built
+.depend

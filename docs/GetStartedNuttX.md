@@ -12,7 +12,7 @@ Wi-Fi add-on (GS2200M). Check the [NuttX platform](PlatformNuttX.md) documentati
 
 ## Configure
 
-`nuttx/spresense/setup.sh` registers `nuttx/` in a Spresense application root directory (`SPRESENSE_HOME`) and configures the SDK with `default device/sdcard feature/wifi feature/ocre`:
+`nuttx/spresense/setup.sh` creates the `ocre` application in a Spresense application root directory (`SPRESENSE_HOME`) and configures the SDK with `default device/sdcard feature/wifi feature/ocre`. The application directory (`~/ocre-spresense-apps/ocre` below) is a build directory: its `Makefile` and `Kconfig` include the ones in `nuttx/`, so objects and generated files are created there and the source tree stays clean.
 
 ```sh
 source ~/spresenseenv/setup

@@ -1,6 +1,6 @@
 # NuttX Platform
 
-Ocre runs on NuttX as a regular NuttX application, located in `nuttx/`. It is built with the NuttX make based build system and configured with `nuttx/Kconfig`. It has been tested on Sony Spresense (Spresense SDK 3.4.7, NuttX 12.3.0).
+Ocre runs on NuttX as a regular NuttX application, located in `nuttx/`. It is built with the NuttX make based build system and configured with `nuttx/Kconfig`. NuttX creates objects in the application directory. `nuttx/` can be used as that directory, or a build directory can include `nuttx/Makefile` after setting `OCRE_NUTTX` to the `nuttx/` path (as `nuttx/spresense/setup.sh` does), with its own `Make.defs`, a `Kconfig` sourcing `nuttx/Kconfig` and a `wamr` link. It has been tested on Sony Spresense (Spresense SDK 3.4.7, NuttX 12.3.0).
 
 Check [Get Started with NuttX](GetStartedNuttX.md) for building and running it.
 
