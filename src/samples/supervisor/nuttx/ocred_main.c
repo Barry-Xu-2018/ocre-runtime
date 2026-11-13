@@ -28,6 +28,25 @@
 static sem_t ready_sem;
 static int ready_rc;
 
+/* ocre_tool (optional, a separate project, CONFIG_OCRE_TOOL): the command "ocre_tool
+ * inspect|pull|run ..." is executed here, in the daemon, like the ocre commands. 'run' needs to
+ * call ocre_shell() with the context, so the daemon passes it as a function. The declaration
+ * must match nuttx/ocre_tool_cmd.c of ocre_tool. (A weak reference would not do: it does not
+ * pull ocre_tool's object out of libapps.a.)
+ */
+
+#ifdef CONFIG_OCRE_TOOL
+typedef int (*ocre_tool_run_fn)(int argc, char **argv, void *ctx);
+
+extern int ocre_tool_command(const char *workdir, ocre_tool_run_fn run, void *run_ctx, int argc, char **argv);
+
+static int ocre_tool_run(int argc, char **argv, void *ctx)
+{
+	optind = 1;
+	return ocre_shell(ctx, argc, argv);
+}
+#endif
+
 static int send_request(struct ocred_request *req)
 {
 	mqd_t mq = mq_open(OCRED_QUEUE_NAME, O_WRONLY);
@@ -94,8 +113,16 @@ static int ocred_daemon(int argc, char *argv[])
 			break;
 		}
 
-		optind = 1;
-		req->result = ocre_shell(ctx, req->argc, req->argv);
+#ifdef CONFIG_OCRE_TOOL
+		if (!strcmp(req->argv[0], "ocre_tool")) {
+			req->result = ocre_tool_command(ocre_context_get_working_directory(ctx), ocre_tool_run, ctx,
+							req->argc, req->argv);
+		} else
+#endif
+		{
+			optind = 1;
+			req->result = ocre_shell(ctx, req->argc, req->argv);
+		}
 
 		fflush(stdout);
 		fflush(stderr);

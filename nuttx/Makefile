@@ -95,6 +95,15 @@ PROGNAME  += ocred ocre
 PRIORITY  += SCHED_PRIORITY_DEFAULT SCHED_PRIORITY_DEFAULT
 STACKSIZE += $(CONFIG_OCRE_DAEMON_STACKSIZE) $(CONFIG_OCRE_CLIENT_STACKSIZE)
 MAINSRC   += ocred_main.c ocre_client_main.c
+
+# 'ocre_tool' is the same client: ocred runs the command line, and looks at argv[0]
+# to tell ocre_tool from ocre.
+ifneq ($(CONFIG_OCRE_TOOL),)
+PROGNAME  += ocre_tool
+PRIORITY  += SCHED_PRIORITY_DEFAULT
+STACKSIZE += $(CONFIG_OCRE_CLIENT_STACKSIZE)
+MAINSRC   += ocre_tool_client_main.c
+endif
 endif
 
 # mini sample
